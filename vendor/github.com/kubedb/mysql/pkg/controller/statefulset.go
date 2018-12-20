@@ -135,6 +135,17 @@ func (c *Controller) createStatefulSet(mysql *api.MySQL) (*apps.StatefulSet, kut
 				},
 			},
 		})
+		//Adding a sidecar container to the statefulset.
+		in.Spec.Template.Spec.Containers = core_util.UpsertContainer(in.Spec.Template.Spec.Containers, core.Container{
+			Name:"test-container",
+			ImagePullPolicy: core.PullIfNotPresent,
+			Image: "nginx:1.7.9",
+			Ports: []core.ContainerPort{
+				{
+					ContainerPort:80,
+				},
+			},
+		})
 		if mysql.GetMonitoringVendor() == mona.VendorPrometheus {
 			in.Spec.Template.Spec.Containers = core_util.UpsertContainer(in.Spec.Template.Spec.Containers, core.Container{
 				Name: "exporter",
